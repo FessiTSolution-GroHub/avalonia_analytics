@@ -1,0 +1,365 @@
+﻿<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:User_Analytics.ViewModels"
+        xmlns:lvc="clr-namespace:LiveChartsCore.SkiaSharpView.Avalonia;assembly=LiveChartsCore.SkiaSharpView.Avalonia"
+        xmlns:oxy="clr-namespace:OxyPlot.Avalonia;assembly=OxyPlot.Avalonia"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"  
+        WindowState="Maximized"
+        x:Class="User_Analytics.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Icon="/Assets/avalonia-logo.ico"
+        Title="User Analytics Dashboard"
+        TransparencyLevelHint="AcrylicBlur">
+
+  <Window.Background>
+    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#D7DDE8" Offset="0"/>
+        <GradientStop Color="#757F9A" Offset="1"/>
+    </LinearGradientBrush>
+</Window.Background>
+
+    <Design.DataContext>
+        <vm:MainWindowViewModel/>
+    </Design.DataContext>
+
+    <Window.Styles>
+       
+       <!-- Compact Stat Card -->
+        <Style Selector="Border.stat-compact">
+            <Setter Property="Background" Value="#804A6FA5"/>
+            <Setter Property="CornerRadius" Value="12"/>
+            <Setter Property="Padding" Value="18,14"/>
+            <Setter Property="BoxShadow" Value="0 2 16 0 #30000000"/>
+            <Setter Property="Transitions">
+                <Transitions>
+                    <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.3" Easing="CubicEaseOut"/>
+                    <BoxShadowsTransition Property="BoxShadow" Duration="0:0:0.3"/>
+                </Transitions>
+            </Setter>
+        </Style>
+        
+        <Style Selector="Border.stat-compact:pointerover">
+            <Setter Property="RenderTransform" Value="scale(1.03)"/>
+            <Setter Property="BoxShadow" Value="0 6 24 0 #50000000"/>
+        </Style>
+        
+        <Style Selector="Button.nav-button:pointerover">
+            <Setter Property="Background" Value="#FF374156"/>
+            <Setter Property="RenderTransform" Value="scale(1.05)"/>
+        </Style>
+        
+        <Style Selector="Button.nav-button:pressed">
+            <Setter Property="RenderTransform" Value="scale(0.96)"/>
+        </Style>
+
+        <!-- Icon Style -->
+        <Style Selector="Path.icon">
+            <Setter Property="Stretch" Value="Uniform"/>
+            <Setter Property="Width" Value="20"/>
+            <Setter Property="Height" Value="20"/>
+        </Style>
+
+        <!-- Header Style -->
+        <Style Selector="TextBlock.page-header">
+            <Setter Property="FontSize" Value="24"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Foreground" Value="White"/>
+        </Style>
+
+        <!-- Stat Number Medium -->
+        <Style Selector="TextBlock.stat-medium">
+            <Setter Property="FontSize" Value="30"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="LetterSpacing" Value="-0.5"/>
+        </Style>
+
+        <!-- Stat Label -->
+        <Style Selector="TextBlock.stat-label">
+            <Setter Property="FontSize" Value="8"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="LetterSpacing" Value="0.8"/>
+        </Style>
+
+        <!-- Section Title -->
+        <Style Selector="TextBlock.section-title">
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="White"/>
+        </Style>
+
+        <Style Selector="TextBlock.subtitle">
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="Foreground" Value="White"/>
+        </Style>
+
+        <!-- Chart Title Style -->
+        <Style Selector="TextBlock.chart-title">
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Margin" Value="0,0,0,12"/>
+        </Style>
+        
+        <!-- Chart Icon Style -->
+        <Style Selector="Path.chart-icon">
+            <Setter Property="Stretch" Value="Uniform"/>
+            <Setter Property="Width" Value="16"/>
+            <Setter Property="Height" Value="16"/>
+            <Setter Property="Fill" Value="White"/>
+        </Style>
+
+        <!-- Accent Bar -->
+        <Style Selector="Border.accent-bar">
+            <Setter Property="Height" Value="3"/>
+            <Setter Property="CornerRadius" Value="2"/>
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+            <Setter Property="Width" Value="60"/>
+            <Setter Property="Margin" Value="0,8,0,0"/>
+        </Style>
+        
+        <!-- Chart Container with ClipToBounds -->
+        <Style Selector="Border.chart-container">
+            <Setter Property="Background" Value="#804A6FA5"/>
+            <Setter Property="CornerRadius" Value="12"/>
+            <Setter Property="Padding" Value="10"/>
+            <Setter Property="BoxShadow" Value="0 2 16 0 #30000000"/>
+            <Setter Property="ClipToBounds" Value="True"/>
+        </Style>
+    </Window.Styles>
+    
+    <Grid Margin="32">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        
+        <!-- Top Bar: Header + Stats -->
+        <Grid Grid.Row="0" Margin="0,0,0,32">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            
+            <!-- Left: Title -->
+            <StackPanel Grid.Column="0" Spacing="6" VerticalAlignment="Center">
+                <TextBlock Classes="page-header" Text="Analytics Dashboard"/>
+                <TextBlock Classes="subtitle" Text="Real-time user insights and metrics"/>
+            </StackPanel>
+
+            <!-- Right: Compact Stats -->
+            <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="16" VerticalAlignment="Center">
+                
+                <!-- Total Users -->
+                <Border Classes = "stat-compact" MinWidth="150">
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="14">
+                        <Border Grid.Column="0" 
+                                Background="#304A90E2" 
+                                CornerRadius="10" 
+                                Width="42" Height="42">
+                            <Path Classes="icon"
+                                  Data="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 4a4 4 0 1 1 0 8 4 4 0 0 1 0-8zm0 14c-2.33 0-4.32-1-5.65-2.35C7.54 15.9 9.64 15 12 15s4.46.9 5.65 2.65C16.32 19 14.33 20 12 20z"
+                                  Fill="#FF4A90E2"
+                                  Margin="11"/>
+                        </Border>
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                            <TextBlock Classes="stat-label" Text="TOTAL USERS"/>
+                            <TextBlock Classes="stat-medium" Text="{Binding TotalUsers}" Margin="0,3,0,0"/>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <!-- Active Users -->
+                <Border Classes="stat-compact" MinWidth="150">
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="14">
+                        <Border Grid.Column="0" 
+                                Background="#3050C878" 
+                                CornerRadius="10" 
+                                Width="42" Height="42">
+                            <Path Classes="icon"
+                                  Data="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15l-5-5 1.41-1.41L11 14.17l7.59-7.59L20 8l-9 9z"
+                                  Fill="#FF50C878"
+                                  Margin="11"/>
+                        </Border>
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                            <TextBlock Classes="stat-label" Text="ACTIVE USERS"/>
+                            <TextBlock Classes="stat-medium" Text="{Binding ActiveUsers}" Margin="0,3,0,0"/>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+             </StackPanel>
+        </Grid>
+
+        <!-- Charts Grid -->
+        <Grid Grid.Row="1" RowSpacing="20" ColumnSpacing="20">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Top Left: Department Demographics -->
+            <Border Grid.Row="0" Grid.Column="0" Classes="chart-container">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    
+                    <TextBlock Grid.Row="0" 
+                               Classes="chart-title" 
+                               Text="🏢 Department Distribution"/>
+                    
+                    <lvc:PieChart Grid.Row="1"
+                                  Series="{Binding DepartmentPieChart}"
+                                  LegendPosition="Right"
+                                  TooltipPosition="Top"
+                                  LegendTextSize="12"
+                                  HorizontalAlignment="Stretch"
+                                  VerticalAlignment="Stretch"
+                                  Margin="0,0,0,10"
+                                  MinHeight="200"/>
+                </Grid>
+            </Border>
+
+            <!-- Top Right: Registration Trends -->
+            <Border Grid.Row="0" Grid.Column="1" Classes="chart-container">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    
+                    <TextBlock Grid.Row="0" 
+                               Classes="chart-title" 
+                               Text="📈 Yearly Registration Trends"/>
+                    
+                    <lvc:CartesianChart Grid.Row="1"
+                                        Series="{Binding RegistrationSeries}"
+                                        XAxes="{Binding RegistrationXAxes}"
+                                        YAxes="{Binding RegistrationYAxes}"
+                                        FindingStrategy="CompareAll"
+                                        TooltipPosition="Auto"
+                                        HorizontalAlignment="Stretch"
+                                        VerticalAlignment="Stretch"
+                                        Margin="0,0,0,10"
+                                        MinHeight="200"/>
+                </Grid>
+            </Border>
+
+            <!-- Bottom Left: Monthly Growth Performance -->
+            <Border Grid.Row="1" Grid.Column="0" Classes="chart-container">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    
+                    <TextBlock Grid.Row="0" 
+                               Classes="chart-title" 
+                               Text="📆 Monthly User Growth"/>
+                    
+                    <Grid Grid.Row="1">
+                        <!-- Chart with controlled height -->
+                        <lvc:CartesianChart
+                            Series="{Binding MonthlySeries}"
+                            XAxes="{Binding MonthlyXAxes}"
+                            YAxes="{Binding MonthlyYAxes}"
+                            HorizontalAlignment="Stretch"
+                            VerticalAlignment="Stretch"
+                            Margin="0,0,0,10"
+                            MinHeight="200"/>
+                        
+                        <!-- Overlay Buttons + Year Label -->
+                        <StackPanel Orientation="Horizontal"
+                                    HorizontalAlignment="Right"
+                                    VerticalAlignment="Top"
+                                    Margin="0,6,6,0"
+                                    Spacing="6"
+                                    Background="#AA1E1E2A"
+                                    >
+                            <Button Content="⬅"
+                                    Command="{Binding PreviousYearCommand}"
+                                    FontSize="11"
+                                    Padding="8,3"
+                                    Background="#FF2A3142"
+                                    Foreground="White"
+                                    CornerRadius="6"
+                                    BorderThickness="0"/>
+                            <TextBlock Text="{Binding SelectedYearLabel}"
+                                       VerticalAlignment="Center"
+                                       Foreground="White"
+                                       FontSize="12"
+                                       FontWeight="SemiBold"
+                                       Margin="4,0"/>
+                            <Button Content="➡"
+                                    Command="{Binding NextYearCommand}"
+                                    FontSize="11"
+                                    Padding="8,3"
+                                    Background="#FF2A3142"
+                                    Foreground="White"
+                                    CornerRadius="6"
+                                    BorderThickness="0"/>
+                        </StackPanel>
+                    </Grid>
+                </Grid>
+            </Border>
+
+            <!-- Bottom Right: Target Achievement Chart -->
+            <Border Grid.Row="1" Grid.Column="1" Classes="chart-container">
+                <Grid ColumnDefinitions="*,Auto">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Title -->
+                    <TextBlock Grid.Row="0" Grid.ColumnSpan="2"
+                               Classes="chart-title"
+                               Text="🎯 Target Achievement"/>
+
+                    <!-- Pie/Polar Chart -->
+                    <oxy:PlotView x:Name="TargetAchievementPlotView"
+                                  Grid.Row="1" Grid.Column="0"
+                                  Model="{Binding TargetAchievementChart}"
+                                  HorizontalAlignment="Stretch"
+                                  VerticalAlignment="Stretch"
+                                  Margin="0,0,0,10"
+                                  MinHeight="200"/>
+
+                    <!-- Legend / Summary -->
+                    <ItemsControl Grid.Row="1" Grid.Column="0"
+                                  ItemsSource="{Binding TargetAchievementLegend}"
+                                  VerticalAlignment="Top" 
+                                  HorizontalAlignment="Right" 
+                                  FontSize="12"
+                                  Margin="0,10,0,0">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal" Margin="0,6">
+                                    <!-- Color rectangle -->
+                                    <Rectangle Width="12" Height="12" Margin="4,0" RadiusX="2" RadiusY="2">
+                                        <Rectangle.Fill>
+                                            <SolidColorBrush Color="{Binding Color}"/>
+                                        </Rectangle.Fill>
+                                    </Rectangle>
+
+                                    <!-- Department and Value -->
+                                    <TextBlock Text="{Binding Department}" FontWeight="Normal"/>
+                                    <TextBlock Text=": " />
+                                    <TextBlock Text="{Binding ValueText}" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </Grid>
+            </Border>
+        </Grid>
+    </Grid>
+</Window>

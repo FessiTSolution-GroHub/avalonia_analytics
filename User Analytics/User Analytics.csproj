@@ -1,0 +1,38 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<OutputType>WinExe</OutputType>
+		<TargetFramework>net8.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+		<BaseOutputPath>bin\Debug\net8.0</BaseOutputPath>
+	</PropertyGroup>
+	<ItemGroup>
+		<AvaloniaResource Include="Assets\**" />
+	</ItemGroup>
+	<ItemGroup>
+		<!-- Avalonia 11.x packages compatible with .NET 8 -->
+		<PackageReference Include="Avalonia" Version="11.3.6" />
+		<PackageReference Include="Avalonia.Desktop" Version="11.3.6" />
+		<PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.6" />
+		<PackageReference Include="Avalonia.Fonts.Inter" Version="11.3.6" />
+		<PackageReference Include="Avalonia.ReactiveUI" Version="11.3.6" />
+		<PackageReference Include="Avalonia.Diagnostics" Version="11.3.6" IncludeAssets="None" PrivateAssets="All" />
+		<!-- MVVM & database -->
+		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.1" />
+		<PackageReference Include="DapperExtensions.NetCore" Version="2.0.7" />
+		<PackageReference Include="Microsoft.Data.Sqlite" Version="8.0.0" />
+		<!-- Charts -->
+		<PackageReference Include="LiveChartsCore.SkiaSharpView.Avalonia" Version="2.0.0-rc6.1" />
+		<PackageReference Include="MongoDB.Driver" Version="3.5.0" />
+		<PackageReference Include="MongoDB.Driver.Core" Version="2.30.0" />
+		<!-- USE THIS VERSION for Avalonia 11 compatibility -->
+		<PackageReference Include="OxyPlot.Avalonia" Version="2.1.0-Avalonia11" />
+		<!-- SkiaSharp for custom coloring -->
+		<PackageReference Include="SkiaSharp" Version="3.119.1" />
+	</ItemGroup>
+	<ItemGroup>
+		<AvaloniaXaml Update="App.axaml">
+			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</AvaloniaXaml>
+	</ItemGroup>
+</Project>

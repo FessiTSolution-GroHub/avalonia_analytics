@@ -1,0 +1,16 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="User_Analytics.App"
+             xmlns:local="using:User_Analytics"
+             RequestedThemeVariant="Light">
+             <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
+    <Application.DataTemplates>
+        <local:ViewLocator/>
+    </Application.DataTemplates>
+  
+    <Application.Styles>
+        <FluentTheme />
+        <!-- Add OxyPlot style for Avalonia 11 -->
+        <StyleInclude Source="avares://OxyPlot.Avalonia/Themes/Default.axaml"/>
+    </Application.Styles>
+</Application>
